@@ -1,0 +1,41 @@
+@page "/events"
+@using EventEaseApp.Models
+@using EventEaseApp.Shared
+
+@code {
+    private List<Event> events = new List<Event>
+    {
+        new Event { Id = 1, Name = "Launch Party", Date = new DateTime(2025, 3, 25), Location = "Naples, Italy" },
+        new Event { Id = 2, Name = "Tech Conference", Date = new DateTime(2025, 5, 15), Location = "Milan, Italy" }
+    };
+
+    private int currentPage = 1;
+    private int pageSize = 10;
+
+    // Paginate events for better performance
+    private IEnumerable<Event> PagedEvents => events.Skip((currentPage - 1) * pageSize).Take(pageSize);
+
+    private void NextPage()
+    {
+        currentPage++;
+    }
+
+    private void PreviousPage()
+    {
+        if (currentPage > 1)
+        {
+            currentPage--;
+        }
+    }
+}
+
+@foreach (var eventItem in PagedEvents)
+{
+    <EventCard EventName="@eventItem.Name" EventDate="@eventItem.Date" EventLocation="@eventItem.Location" />
+    <a href="/event/@eventItem.Id">View Details</a>
+}
+
+<div class="pagination-buttons">
+    <button @onclick="PreviousPage">Previous</button>
+    <button @onclick="NextPage">Next</button>
+</div>

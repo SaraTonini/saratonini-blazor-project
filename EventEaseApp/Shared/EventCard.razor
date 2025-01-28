@@ -1,0 +1,31 @@
+@code {
+    [Parameter]
+    public string? EventName { get; set; } 
+
+    [Parameter]
+    public DateTime EventDate { get; set; }
+
+    [Parameter]
+    public string? EventLocation { get; set; }  
+
+    // Validate input data
+    private bool IsValid()
+    {
+        return !string.IsNullOrEmpty(EventName) && EventDate != default && !string.IsNullOrEmpty(EventLocation);
+    }
+}
+
+@if (IsValid())
+{
+    <div class="event-card">
+        <h2>@EventName</h2>
+        <p>@EventDate.ToString("MMMM dd, yyyy")</p>
+        <p>@EventLocation</p>
+    </div>
+}
+else
+{
+    <div class="event-card error">
+        <p>Invalid event data</p>
+    </div>
+}

@@ -1,0 +1,38 @@
+@page "/event/{eventId:int}"
+@using EventEaseApp.Models
+
+@inject SessionService SessionService
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? selectedEvent;  
+    private bool isRegistered;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Fetch event by EventId
+        selectedEvent = new Event { Id = EventId, Name = "Sample Event", Date = new DateTime(2025, 4, 15), Location = "Rome, Italy" };
+
+        // Check if the user is already registered
+        var (userName, userEmail) = await SessionService.GetUserSessionAsync();
+        isRegistered = !string.IsNullOrEmpty(userName) && !string.IsNullOrEmpty(userEmail);
+    }
+}
+
+@if (selectedEvent != null) 
+{
+    @if (isRegistered)
+    {
+        <p>You are already registered for this event.</p>
+    }
+    else
+    {
+        <a href="/register/@selectedEvent.Id">Register</a>
+    }
+}
+else
+{
+    <p>Event not found.</p>
+}

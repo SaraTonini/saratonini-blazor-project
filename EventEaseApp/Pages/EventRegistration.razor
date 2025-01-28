@@ -1,0 +1,71 @@
+@page "/register/{eventId:int}"
+@using EventEaseApp.Models
+@using System.ComponentModel.DataAnnotations
+
+@inject SessionService SessionService
+
+@code {
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Event? selectedEvent; 
+    private string? userName;  
+    private string? userEmail; 
+    private bool formSubmitted;
+    private string? errorMessage; 
+
+    protected override void OnInitialized()
+    {
+        // Fetch event by EventId
+        selectedEvent = new Event { Id = EventId, Name = "Sample Event", Date = new DateTime(2025, 4, 15), Location = "Rome, Italy" };
+    }
+
+    private async Task HandleSubmit()
+    {
+        // Validate form inputs
+        if (string.IsNullOrEmpty(userName) || string.IsNullOrEmpty(userEmail))
+        {
+            errorMessage = "All fields are required.";
+        }
+        else if (!new EmailAddressAttribute().IsValid(userEmail))
+        {
+            errorMessage = "Invalid email address.";
+        }
+        else
+        {
+            formSubmitted = true;
+            errorMessage = string.Empty;
+            // Register logic here
+            await SessionService.SetUserSessionAsync(userName, userEmail);
+        }
+    }
+}
+
+@if (!formSubmitted)
+{
+    @if (selectedEvent != null)  // Controlla se selectedEvent è null
+    {
+        <form @onsubmit="HandleSubmit">
+            <h2>Registration for @selectedEvent.Name</h2>
+            <label for="name">Name</label>
+            <input type="text" id="name" @bind="userName" />
+            <br />
+            <label for="email">Email</label>
+            <input type="email" id="email" @bind="userEmail" />
+            <br />
+            <button type="submit">Register</button>
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <p class="error">@errorMessage</p>
+            }
+        </form>
+    }
+    else
+    {
+        <p>Event not found.</p>
+    }
+}
+else
+{
+    <p>Thank you for registering, @userName!</p>
+}
